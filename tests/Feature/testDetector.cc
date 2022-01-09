@@ -135,7 +135,18 @@ TEST_F(TestDetector, Detector){
 }
 
 
+static void printKeypoints(const std::vector<std::vector<sf::Keypoint>>& keypoints){
+    for(size_t kki = 0, kkend = keypoints.size(); kki < kkend; ++kki){
+        for(size_t ki = 0, kend = keypoints[kki].size(); ki < kend; ++ki){
+
+            std::cout << keypoints[kki][ki] << std::endl;
+        }
+    }
+}
+
+
 TEST_F(TestDetector, FastDetector){
+    
     sf::SharedPtr<sf::FastDetector> fastPtr = sf::FastDetector::createDetectorPtr(100, 30, 8, 35, 1);
 
     EXPECT_EQ(fastPtr -> getMaxNumKeypoints(), 100);
@@ -164,13 +175,13 @@ TEST_F(TestDetector, FastDetector){
     EXPECT_EQ(fastPtr -> getNumKeypoints(), 0);
     //EXPECT_EQ(fastPtr -> getClassName(), "FastDetector");
 
-    std::vector<sf::Keypoint> keypoints1;
+    std::vector<std::vector<sf::Keypoint>> keypoints1;
     fastPtr -> detectKeypoints(img1, 5, 5, img1.rows - 10, img1.cols - 10, keypoints1);
-    EXPECT_EQ(keypoints1.size(), 0);
+    EXPECT_EQ(fastPtr -> getNumKeypoints(), 0);
 
-    std::vector<sf::Keypoint> keypoints2;
+    std::vector<std::vector<sf::Keypoint>> keypoints2;
     fastPtr -> detectKeypoints(img2, 5, 5, img2.rows - 10, img2.cols - 10, keypoints2);
-    EXPECT_EQ(keypoints2.size(), 0);
+    EXPECT_EQ(fastPtr -> getNumKeypoints(), 0);
 
 /*
     std::vector<sf::Keypoint> keypoints3;
@@ -180,43 +191,39 @@ TEST_F(TestDetector, FastDetector){
         std::cout << keypoints3[ki] << std::endl;
 */
 
-    std::vector<sf::Keypoint> keypoints4;
+    std::vector<std::vector<sf::Keypoint>> keypoints4;
     fastPtr -> detectKeypoints(img4, 5, 5, img4.rows - 10, img4.cols - 10, keypoints4);
-    EXPECT_TRUE(keypoints4.size() > 0);
     EXPECT_TRUE(fastPtr -> getNumKeypoints() > 0);
-    for(size_t ki = 0, kend = keypoints4.size(); ki<kend; ++ki)
-        std::cout << keypoints4[ki] << std::endl;
+    printKeypoints(keypoints4);
+    std::cout<<std::endl;
     
-    std::vector<sf::Keypoint> keypoints5;
+    std::vector<std::vector<sf::Keypoint>> keypoints5;
     fastPtr -> detectKeypoints(img5, 5, 5, img5.rows - 10, img5.cols - 10, keypoints5);
-    EXPECT_TRUE(keypoints5.size() > 0);
     EXPECT_TRUE(fastPtr -> getNumKeypoints() > 0);
-    for(size_t ki = 0, kend = keypoints5.size(); ki<kend; ++ki)
-        std::cout << keypoints5[ki] << std::endl;
+    printKeypoints(keypoints5);
+    std::cout<<std::endl;
 
     //nms test
     fastPtr -> setNms(3);
     EXPECT_TRUE(fastPtr -> nmsUsed());
 
-    std::vector<sf::Keypoint> keypoints6;
+    std::vector<std::vector<sf::Keypoint>> keypoints6;
     fastPtr -> detectKeypoints(img4, 5, 5, img4.rows - 10, img4.cols - 10, keypoints6);
-    EXPECT_TRUE(keypoints6.size() > 0);
     EXPECT_TRUE(fastPtr -> getNumKeypoints() > 0);
-    for(size_t ki = 0, kend = keypoints6.size(); ki<kend; ++ki)
-        std::cout << keypoints6[ki] << std::endl;
+    printKeypoints(keypoints6);
+    std::cout<<std::endl;
 
 
     //grid test
     fastPtr -> gridAssignment(10, 10);
     EXPECT_TRUE(fastPtr -> gridUsed());
 
-    std::vector<sf::Keypoint> keypoints7;
+    std::vector<std::vector<sf::Keypoint>> keypoints7;
     fastPtr -> detectKeypoints(img4, 5, 5, img4.rows - 10, img4.cols - 10, keypoints7);
-    EXPECT_TRUE(keypoints7.size() > 0);
     EXPECT_TRUE(fastPtr -> getNumKeypoints() > 0);
-    for(size_t ki = 0, kend = keypoints7.size(); ki<kend; ++ki)
-        std::cout << keypoints7[ki] << std::endl;
-    
+    printKeypoints(keypoints7);
+    std::cout<<std::endl;
+
 }
 
 

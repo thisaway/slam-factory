@@ -71,7 +71,9 @@
 
 #if defined(__cplusplus)
 #  if defined(_MSC_VER) && _MSC_VER <1600
+
 namespace sf{
+
     typedef signed char int8_t;
     typedef unsigned char uint8_t;
     typedef signed short int16_t;
@@ -81,8 +83,10 @@ namespace sf{
     typedef signed __int64 int64_t;
     typedef unsigned __int64 uint64_t;
 }
+
 #  elif defined(_MSC_VER) || __cplusplus >=201103L
 #include <cstdint>
+
 namespace sf{
     using std::int8_t;
     using std::uint8_t;
@@ -96,6 +100,7 @@ namespace sf{
 #  else
 #include <stdint.h>
 namespace sf{
+    
     typedef ::int8_t int8_t;  //:: global representation
     typedef ::uint8_t uint8_t;
     typedef ::int16_t int16_t;

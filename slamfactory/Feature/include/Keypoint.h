@@ -1,3 +1,4 @@
+//Keypoint.h
 #ifndef SLAM_FACTORY_FEATURE_KEYPOINT_H
 #define SLAM_FACTORY_FEATURE_KEYPOINT_H
 
@@ -25,14 +26,14 @@ struct SF_EXPORTS Keypoint{
     double orientation;
     double score;
     uint32_t classId;
-    bool bad;
 
     Keypoint() : x(0.0), y(0.0), adjacentAreaRadius(0.0), octave(0), orientation(0.0),  \
-                score(0.0), classId(0), bad(false){}
+                score(0.0), classId(0){}
+
     Keypoint(float _x, float _y, float _adjacentAreaRadius, uint8_t _octave,  \
-                double _orientation, double _score, uint32_t _classId, bool _bad)  \
+                double _orientation, double _score, uint32_t _classId)  \
                 : x(_x), y(_y), adjacentAreaRadius(_adjacentAreaRadius), octave(_octave),  \
-                orientation(_orientation), score(_score), classId(_classId), bad(_bad){}
+                orientation(_orientation), score(_score), classId(_classId){}
 
 };
 
@@ -43,7 +44,7 @@ struct SF_EXPORTS Keypoint{
 std::ostream& operator<<(std::ostream& os, const Keypoint& kp){
 
     os << kp.x << " " << kp.y << " " << kp.adjacentAreaRadius << " " << kp.octave << " "  \
-        << kp.orientation << " " << kp.score << " " << kp.classId << " " << kp.bad;
+        << kp.orientation << " " << kp.score << " " << kp.classId;
     
     return os;
 }
