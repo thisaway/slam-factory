@@ -88,8 +88,8 @@ namespace sf{
         virtual uint8_t getSrcImageLevel() const=0;
         virtual void setSrcImageLevel(uint8_t _srcImageLevel)=0;
 
-        virtual float getAdjacentAreaRadius() const=0;
-        virtual void setAdjacentAreaRadius(float _adjacentAreaRadius)=0;
+        virtual uint16_t getAdjacentAreaRadius() const=0;
+        virtual void setAdjacentAreaRadius(uint16_t _adjacentAreaRadius)=0;
 
         virtual uint8_t getRandomPointNum() const=0;
         virtual void setRandomPointNum(uint8_t _randomPointNum)=0;

@@ -51,7 +51,7 @@ typedef Point2D<uint64_t>       Point2ui64;
 
 template<typename _Tp>
 struct SF_EXPORTS Point3D{
-    
+
     _Tp x;
     _Tp y;
     _Tp z;
@@ -95,8 +95,16 @@ using MatXui16 = Eigen::Matrix<uint16_t, Dynamic, Dynamic>;
 using MatXui32 = Eigen::Matrix<uint32_t, Dynamic, Dynamic>;
 using MatXui64 = Eigen::Matrix<uint64_t, Dynamic, Dynamic>;
 
-template <typename _Scalar, int _Rows, int _Cols> 
-using Description = Eigen::Matrix<_Scalar, _Rows, _Cols>;
+
+//Description
+template <typename _Tp, int _Length> 
+using Description = Eigen::Matrix<_Tp, 1, _Length>;
+
+typedef uint8_t BriefMetaType;
+typedef Description<BriefMetaType, 32> BriefDescription256;
+typedef Description<BriefMetaType, 16> BriefDescription128;
+typedef Description<BriefMetaType, 8>  BriefDescription64;
+
 
 /*
 class SF_EXPORTS Pose{

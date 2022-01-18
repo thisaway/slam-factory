@@ -5,18 +5,18 @@
 #include "Types.h"
 
 namespace sf{
-    
+
 class Image{
 
 public:
 
     Image();
-    Image(uint32_t r,uint32_t c,uint8_t iniValue=0);
+    Image(int r,int c, uint8_t iniValue=0);
     Image(const MatXui8& img);
     Image(const Image& img);
     Image& operator=(const Image& img);
 
-    inline const uint8_t& operator()(const uint32_t& r,const uint32_t& c) const{
+    inline const uint8_t& operator()(const int& r, const int& c) const{
         return data(r,c);
     }
 
@@ -24,8 +24,8 @@ public:
 
 public:
 
-    uint32_t rows;
-    uint32_t cols;
+    int rows;
+    int cols;
 
 protected:
 

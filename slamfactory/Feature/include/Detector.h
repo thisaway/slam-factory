@@ -14,14 +14,14 @@ class Image;
 struct DetectorIn;
 
 class SF_EXPORTS Detector{
-    
+
 public:
 
     /** @brief Assign a grid to the image;
     *** @param rows Rows of grid;
     *** @param cols Cols of grid;
     **/
-    void gridAssignment(uint32_t rows, uint32_t cols);
+    void gridAssignment(int rows, int cols);
     
     /** @brief Is grid used;
     *** @return If rows > 0 and cols > 0 return true, otherwise return false;
@@ -31,7 +31,7 @@ public:
     /** @brief Non-maximum suppression of detector;
     *** @param radius Radius of nms;
     **/
-    void setNms(uint16_t radius);
+    void setNms(int radius);
     
     /** @brief Is NMS method used;
     *** @return Return true if nms used; otherwise,return false;
@@ -46,8 +46,8 @@ public:
     *** @param width Width of the area to be detected；;
     *** @param keypoints Keypoints detected;
     **/
-    virtual void detectKeypoints(SF_IN const Image& img, uint32_t x, uint32_t y, uint32_t height,  \
-            uint32_t width, SF_OUT std::vector<std::vector<Keypoint>>& keypoints) = 0;
+    virtual void detectKeypoints(SF_IN const Image& img, int x, int y, int height,  \
+            int width, SF_OUT std::vector<std::vector<Keypoint>>& keypoints) = 0;
 
     virtual const char* getClassName() const;
 
@@ -77,26 +77,26 @@ public:
     *** @param gridRows Rows of grids, when gridRows > 0 and gridCols > 0, means FastDetector will use grid;
     *** @param gridCols Cols of grids, when gridRows > 0 and gridCols > 0, means FastDetector will use grid;
     **/
-    static SharedPtr<FastDetector> createDetectorPtr(uint32_t maxNumKeypoints, float pixelThreshold,  \
-            uint8_t fastType, float adjacentAreaRadius, uint8_t octave, uint16_t nmsRadius = 0,  \
-            uint16_t gridRows = 0, uint16_t gridCols = 0);
+    static SharedPtr<FastDetector> createDetectorPtr(int maxNumKeypoints, float pixelThreshold,  \
+            int fastType, int adjacentAreaRadius, int octave, int nmsRadius = 0,  \
+            int gridRows = 0, int gridCols = 0);
 
-    virtual uint32_t getMaxNumKeypoints() const = 0;
-    virtual void setMaxNumKeypoints(uint32_t maxNumKeypoints) = 0;
+    virtual int getMaxNumKeypoints() const = 0;
+    virtual void setMaxNumKeypoints(int maxNumKeypoints) = 0;
 
     virtual float getPixelThreshold() const = 0;
     virtual void setPixelThreshold(float pixelThreshold) = 0;
 
-    virtual float getAdjacentAreaRadius() const = 0;
-    virtual void setAdjacentAreaRadius(float radius) = 0;
+    virtual int getAdjacentAreaRadius() const = 0;
+    virtual void setAdjacentAreaRadius(int radius) = 0;
 
-    virtual uint8_t getOctave() const = 0;
-    virtual void setOctave(uint8_t octave) = 0;
+    virtual int getOctave() const = 0;
+    virtual void setOctave(int octave) = 0;
 
-    virtual uint8_t getFastType() const = 0;
-    virtual void setFastType(uint8_t type) = 0;
+    virtual int getFastType() const = 0;
+    virtual void setFastType(int type) = 0;
 
-    virtual uint32_t getNumKeypoints() const = 0;
+    virtual int getNumKeypoints() const = 0;
 
     virtual const char* getClassName() const SF_OVERRIDE;
 

@@ -35,4 +35,4 @@ if(BUILD_TESTS)
   add_subdirectory(tests)
 endif(BUILD_TESTS)
 
-add_subdirectory(slamFactory)
+add_subdirectory(slamfactory)

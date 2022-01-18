@@ -11,9 +11,9 @@ namespace sf{
 
 struct DetectorIn{
 
-    uint16_t nmsR;  //NMS radius;
-    uint16_t gr;  //grid rows;
-    uint16_t gc;  //grid cols;
+    int nmsR;  //NMS radius;
+    int gr;  //grid rows;
+    int gc;  //grid cols;
 };
 
 const char* Detector::
@@ -23,8 +23,8 @@ getClassName() const{
 }
 
 
-using MatXpt2i32 = Eigen::Matrix<Point2i32, Dynamic, Dynamic>;
-MatXpt2i32 kpMarks;  //A mat place wheather there is a keypoint;
+using MatXpt2i = Eigen::Matrix<Point2i, Dynamic, Dynamic>;
+MatXpt2i kpMarks;  //A mat place wheather there is a keypoint;
 
 
 #define FAST_CORNER_TEST(x, i)  \
@@ -54,10 +54,10 @@ MatXpt2i32 kpMarks;  //A mat place wheather there is a keypoint;
 *** @param w Width of the area;
 *** @param orientation Orientation to be computed;
 **/
-static void computeOrientation(const Image& img, uint32_t x, uint32_t y,  \
-        uint32_t h, uint32_t w, double& orientation){
+static void computeOrientation(const Image& img, int x, int y,  \
+        int h, int w, double& orientation){
 
-    uint32_t bottomRightX = x + h, bottomRightY = y + w;
+    int bottomRightX = x + h, bottomRightY = y + w;
 
     assert(bottomRightX < img.rows and bottomRightY < img.cols);
 
@@ -71,18 +71,18 @@ static void computeOrientation(const Image& img, uint32_t x, uint32_t y,  \
         }
     }
 
-    orientation=atan(ypSum / double(xpSum));
+    orientation=atan(ypSum / static_cast<double>(xpSum));
 }
 
 
 //If (x,y) point is suppression,return false;otherwise return true;
-static bool nms(const uint32_t& x, const uint32_t& y, const uint16_t& nmsRadius, const double& score,  \
+static bool nms(const int& x, const int& y, const int& nmsRadius, const double& score,  \
         std::vector<std::vector<Keypoint>>& keypoints){
 
-    for(uint32_t xi = x - nmsRadius; xi <= x; ++xi){
-        for(uint32_t yi = y - nmsRadius; yi <= y; ++yi){
+    for(int xi = x - nmsRadius; xi <= x; ++xi){
+        for(int yi = y - nmsRadius; yi <= y; ++yi){
 
-            const Point2i32& pt = kpMarks(xi, yi);
+            const Point2i& pt = kpMarks(xi, yi);
 
             if(pt.x < 0 or keypoints[pt.x][pt.y].score < 0)continue;
 
@@ -99,8 +99,10 @@ static bool nms(const uint32_t& x, const uint32_t& y, const uint16_t& nmsRadius,
 
 //Detector
 void Detector::
-gridAssignment(uint32_t rows, uint32_t cols){
+gridAssignment(int rows, int cols){
     
+    assert(rows > 0 and cols > 0);
+
     internalPtr -> gr = rows;
     internalPtr -> gc = cols;
 }
@@ -113,8 +115,9 @@ gridUsed() const{
 }
 
 void Detector::
-setNms(uint16_t radius){
+setNms(int radius){
 
+    assert(radius >= 0);
     internalPtr -> nmsR = radius;
 }
 
@@ -132,7 +135,7 @@ static bool compareKpScore(const Keypoint& kp1, const Keypoint& kp2){
 }
 
 
-static uint32_t serachFirstKeypointNegetive(const std::vector<Keypoint>& keypoints, double value){
+static int serachFirstKeypointNegetive(const std::vector<Keypoint>& keypoints, double value){
 
     size_t ibeg = 0, iend = keypoints.size();
     size_t imid = (ibeg + iend) / 2;
@@ -154,9 +157,9 @@ class FastDetectorImpl SF_FINAL : public FastDetector{
 
 public:
 
-    FastDetectorImpl(uint32_t maxNumKeypoints, float pixelThreshold, uint8_t fastType,  \
-        float adjacentAreaRadius, uint8_t octave, uint16_t nmsRadius = 0, uint16_t gridRows = 0,  \
-        uint16_t gridCols = 0) : mnkps(maxNumKeypoints), pTh(pixelThreshold), areaR(adjacentAreaRadius),  \
+    FastDetectorImpl(int maxNumKeypoints, float pixelThreshold, int fastType,  \
+        int adjacentAreaRadius, int octave, int nmsRadius = 0, int gridRows = 0,  \
+        int gridCols = 0) : mnkps(maxNumKeypoints), pTh(pixelThreshold), areaR(adjacentAreaRadius),  \
         oct(octave), type(fastType), nkps(0){
              
             internalPtr = new DetectorIn();
@@ -167,50 +170,58 @@ public:
     
     ~FastDetectorImpl(){delete internalPtr;}
     
-    uint32_t getMaxNumKeypoints() const SF_OVERRIDE{return mnkps;}
-    void setMaxNumKeypoints(uint32_t maxNumKeypoints) SF_OVERRIDE {mnkps = maxNumKeypoints;}
+    inline int getMaxNumKeypoints() const SF_OVERRIDE{return mnkps;}
+    inline void setMaxNumKeypoints(int maxNumKeypoints) SF_OVERRIDE {
+        
+        assert(maxNumKeypoints > 0);
+        mnkps = maxNumKeypoints;
+    }
 
-    float getAdjacentAreaRadius() const SF_OVERRIDE{return areaR;}
-    void setAdjacentAreaRadius(float radius) SF_OVERRIDE{areaR = radius;}
+    inline int getAdjacentAreaRadius() const SF_OVERRIDE{return areaR;}
+    inline void setAdjacentAreaRadius(int radius) SF_OVERRIDE{
+        
+        assert(radius >= 0);
+        areaR = radius;
+    }
 
-    uint8_t getOctave() const SF_OVERRIDE{return oct;}
-    void setOctave(uint8_t octave) SF_OVERRIDE{oct = octave;}
+    inline int getOctave() const SF_OVERRIDE{return oct;}
+    inline void setOctave(int octave) SF_OVERRIDE{oct = octave;}
 
-    float getPixelThreshold() const SF_OVERRIDE{return pTh;}
-    void setPixelThreshold(float pixelThreshold) SF_OVERRIDE {pTh = pixelThreshold;}
+    inline float getPixelThreshold() const SF_OVERRIDE{return pTh;}
+    inline void setPixelThreshold(float pixelThreshold) SF_OVERRIDE {pTh = pixelThreshold;}
 
-    uint8_t getFastType() const SF_OVERRIDE{return type;}
-    void setFastType(uint8_t fastType) SF_OVERRIDE{type = fastType;}
+    inline int getFastType() const SF_OVERRIDE{return type;}
+    inline void setFastType(int fastType) SF_OVERRIDE{type = fastType;}
 
-    uint32_t getNumKeypoints() const SF_OVERRIDE{return nkps;}
+    inline int getNumKeypoints() const SF_OVERRIDE{return nkps;}
 
-    void detectKeypoints(const Image& img, uint32_t x, uint32_t y, uint32_t height,  \
-            uint32_t width, std::vector<std::vector<Keypoint>>& keypoints) SF_OVERRIDE;
+    void detectKeypoints(const Image& img, int x, int y, int height,  \
+            int width, std::vector<std::vector<Keypoint>>& keypoints) SF_OVERRIDE;
 
 private:
 
-    void detectSubAreaKeypoints(const Image& img, uint32_t x, uint32_t y,  \
-        uint32_t h, uint32_t w, std::vector<std::vector<Keypoint>>& keypoints,  \
-        uint32_t& kpId, size_t index);
+    void detectSubAreaKeypoints(const Image& img, int x, int y,  \
+        int h, int w, std::vector<std::vector<Keypoint>>& keypoints,  \
+        int& kpId, size_t index);
 
-    bool isFastCorner(const Image& img, const uint32_t& x, const uint32_t& y,  \
-        const uint8_t& fastType, const float& pixelTh, double& score);
+    bool isFastCorner(const Image& img, const int& x, const int& y,  \
+        const int& fastType, const float& pixelTh, double& score);
     
-    void retainMaximunKps(uint32_t cmnkps, std::vector<Keypoint>& keypoints);
+    void retainMaximunKps(int cmnkps, std::vector<Keypoint>& keypoints);
 
 protected:
 
-    uint32_t mnkps;  //max num keypoints;
+    int mnkps;  //max num keypoints;
     float pTh;  //pixel threshold;
-    float areaR;
-    uint8_t oct;  //octave
-    uint8_t type;  //FAST4 or FAST9 or FAST12;
-    uint32_t nkps;  //keypoints number after NMS;
+    int areaR;
+    int oct;  //octave
+    int type;  //FAST4 or FAST9 or FAST12;
+    int nkps;  //keypoints number after NMS;
 };
 
 
 void FastDetectorImpl::
-retainMaximunKps(uint32_t cmnkps, std::vector<Keypoint>& keypoints){
+retainMaximunKps(int cmnkps, std::vector<Keypoint>& keypoints){
 
     if(keypoints.size() == 0){
 
@@ -222,7 +233,7 @@ retainMaximunKps(uint32_t cmnkps, std::vector<Keypoint>& keypoints){
 
     if(internalPtr->nmsR > 0){
 
-        uint32_t negetiveIndex = serachFirstKeypointNegetive(keypoints, -1);
+        int negetiveIndex = serachFirstKeypointNegetive(keypoints, -1);
 
         keypoints.resize(negetiveIndex);
     }
@@ -236,8 +247,8 @@ retainMaximunKps(uint32_t cmnkps, std::vector<Keypoint>& keypoints){
 
 
 void FastDetectorImpl::
-detectKeypoints(const Image& img, uint32_t x, uint32_t y, uint32_t height,  \
-        uint32_t width, std::vector<std::vector<Keypoint>>& keypoints){
+detectKeypoints(const Image& img, int x, int y, int height,  \
+        int width, std::vector<std::vector<Keypoint>>& keypoints){
 
     assert(x > 4 and y > 4);
     assert(x + height < img.rows-3 and y + width < img.cols-3);
@@ -249,10 +260,10 @@ detectKeypoints(const Image& img, uint32_t x, uint32_t y, uint32_t height,  \
         }
     }
 
-    uint32_t kpId = 0;
+    int kpId = 0;
 
-    uint32_t gr = internalPtr->gr;
-    uint32_t gc = internalPtr->gc;
+    int gr = internalPtr->gr;
+    int gc = internalPtr->gc;
 
     if(gr == 0 or gc == 0){  //No assign grid;
 
@@ -266,16 +277,16 @@ detectKeypoints(const Image& img, uint32_t x, uint32_t y, uint32_t height,  \
     }
     else{  //assigned grid;
 
-        uint32_t gmnkps = mnkps / (gr * gc);
+        int gmnkps = mnkps / (gr * gc);
 
-        uint32_t gridCellHeight = height / gr, gridCellWidth = width / gc;
+        int gridCellHeight = height / gr, gridCellWidth = width / gc;
 
         keypoints.resize(gr * gc);
 
-        uint32_t kIndex;
+        int kIndex;
 
-        for(uint32_t gridx = 0; gridx < gr - 1; ++gridx){
-            for(uint32_t gridy = 0; gridy < gc - 1; ++gridy){
+        for(int gridx = 0; gridx < gr - 1; ++gridx){
+            for(int gridy = 0; gridy < gc - 1; ++gridy){
                 
                 kIndex = gridx * (gc - 1) + gridy;
                 keypoints[kIndex].reserve(2 * gmnkps);
@@ -295,17 +306,17 @@ detectKeypoints(const Image& img, uint32_t x, uint32_t y, uint32_t height,  \
 
 
 void FastDetectorImpl::
-detectSubAreaKeypoints(const Image& img, uint32_t x, uint32_t y,  \
-        uint32_t h, uint32_t w, std::vector<std::vector<Keypoint>>& keypoints,  \
-        uint32_t& kpId, size_t index){
+detectSubAreaKeypoints(const Image& img, int x, int y,  \
+        int h, int w, std::vector<std::vector<Keypoint>>& keypoints,  \
+        int& kpId, size_t index){
 
-    uint16_t nmsRadius = internalPtr -> nmsR;
+    int nmsRadius = internalPtr -> nmsR;
 
     double orientation, score;
 
-    for(uint32_t xi = x, xend = x + h; xi < xend; ++xi){
+    for(int xi = x, xend = x + h; xi < xend; ++xi){
 
-        for(uint32_t yi = y, yend = y + w; yi < yend; ++yi){
+        for(int yi = y, yend = y + w; yi < yend; ++yi){
             
             if(!isFastCorner(img, xi, yi, type, pTh, score))continue;
 
@@ -321,10 +332,10 @@ detectSubAreaKeypoints(const Image& img, uint32_t x, uint32_t y,  \
 
 
 bool FastDetectorImpl::
-isFastCorner(const Image& img, const uint32_t& x, const uint32_t& y,  \
-        const uint8_t& fastType, const float& pixelTh, double& score){
+isFastCorner(const Image& img, const int& x, const int& y,  \
+        const int& fastType, const float& pixelTh, double& score){
 
-    uint8_t resultArray[16 + fastType] = {0};
+    int resultArray[16 + fastType] = {0};
     double sumSmall = 0.0, sumGreat = 0.0;
 
     const double pd = img(x, y) - pixelTh;
@@ -335,7 +346,7 @@ isFastCorner(const Image& img, const uint32_t& x, const uint32_t& y,  \
     FAST_CORNER_TEST(img(x - 4, y), 0)  //0
     FAST_CORNER_TEST(img(x + 4, y), 8)  //8
 
-    uint8_t d = resultArray[0] | resultArray[8];
+    int d = resultArray[0] | resultArray[8];
 
     if(d == 0)return false;
 
@@ -392,8 +403,8 @@ isFastCorner(const Image& img, const uint32_t& x, const uint32_t& y,  \
 
     if(d == 0)return false;
     
-    uint8_t count = 1;
-    uint8_t i = 1,iend = 16 + fastType;
+    int count = 1;
+    int i = 1,iend = 16 + fastType;
 
     for(; i < iend; ++i){
         if(count > fastType)break;
@@ -413,14 +424,18 @@ isFastCorner(const Image& img, const uint32_t& x, const uint32_t& y,  \
 
 
 SharedPtr<FastDetector> FastDetector::
-createDetectorPtr(uint32_t maxNumKeypoints, float pixelThreshold, uint8_t fastType,  \
-        float adjacentAreaRadius, uint8_t octave, uint16_t nmsRadius, uint16_t gridRows,  \
-        uint16_t gridCols){
+createDetectorPtr(int maxNumKeypoints, float pixelThreshold, int fastType,  \
+        int adjacentAreaRadius, int octave, int nmsRadius, int gridRows,  \
+        int gridCols){
 
     assert(fastType == FastDetector::FAST4 or fastType == FastDetector::FAST9 or  \
             fastType == FastDetector::FAST12);
 
     assert(pixelThreshold > 0);
+    assert(maxNumKeypoints > 0);
+    assert(adjacentAreaRadius > 0);
+    assert(nmsRadius >= 0);
+    assert(gridRows >= 0 and gridCols >= 0);
 
     return std::make_shared<FastDetectorImpl>(maxNumKeypoints, pixelThreshold, fastType, adjacentAreaRadius,  \
                                             octave, nmsRadius, gridRows, gridCols);

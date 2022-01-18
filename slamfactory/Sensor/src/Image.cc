@@ -8,7 +8,7 @@ Image::
 Image(){}
 
 Image::
-Image(uint32_t r,uint32_t c,uint8_t iniValue){
+Image(int r,int c,uint8_t iniValue){
 
     assert(r>0 and c>0);
 
