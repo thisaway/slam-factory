@@ -13,7 +13,7 @@ namespace sf{
 
 class Image;
 
-template <typename _Tp, int _Length>
+
 class SF_EXPORTS Descriptor{
 
 public:
@@ -24,15 +24,15 @@ public:
     /** @brief Compute description of keypoints;
     *** @param img Input image;
     *** @param keypoints Keypoints to be described;
-    *** @param descriptions Description of keypoints;
+    *** @param descriptions Description vector of keypoints， void* means Description pointer.
     **/
     virtual void computeDescription(SF_IN const Image& img,  \
             SF_IN const std::vector<std::vector<Keypoint>>& keypoints,  \
-            SF_OUT std::vector<std::vector<Description<_Tp, _Length>>>& descriptions) = 0; 
+            SF_OUT std::vector<std::vector<void*>> descriptions) = 0; 
 };
 
-template <int _Length>
-class SF_EXPORTS BriefDescriptor : public Descriptor<BriefMetaType, _Length>{
+
+class SF_EXPORTS BriefDescriptor : public Descriptor{
 
 public:
 
@@ -40,7 +40,9 @@ public:
 
     enum{UNIFORM = 1, NORMAL = 2};
 
-    #define BRIEF_BIT_EACH_INT 8
+    static const int BRIEF_BIT_EACH_INT = 8;
+
+    typedef uint8_t BriefMetaType;
     
     static SharedPtr<BriefDescriptor> createDescriptorPtr(int numComparedPoints = 2,  \
             int descriptionLength = 256, int adjacentAreaRadius = 15, int randomType = UNIFORM);

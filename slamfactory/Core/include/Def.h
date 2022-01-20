@@ -74,41 +74,42 @@
 
 namespace sf{
 
-    typedef signed char int8_t;
-    typedef unsigned char uint8_t;
-    typedef signed short int16_t;
-    typedef unsigned short uint6_t;
-    typedef signed int int32_t;
-    typedef unsigned int uint32_t;
-    typedef signed __int64 int64_t;
-    typedef unsigned __int64 uint64_t;
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef signed short int16_t;
+typedef unsigned short uint6_t;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
+typedef signed __int64 int64_t;
+typedef unsigned __int64 uint64_t;
 }
 
 #  elif defined(_MSC_VER) || __cplusplus >=201103L
 #include <cstdint>
 
 namespace sf{
-    using std::int8_t;
-    using std::uint8_t;
-    using std::int16_t;
-    using std::uint16_t;
-    using std::int32_t;
-    using std::uint32_t;
-    using std::int64_t;
-    using std::uint64_t;
+
+using std::int8_t;
+using std::uint8_t;
+using std::int16_t;
+using std::uint16_t;
+using std::int32_t;
+using std::uint32_t;
+using std::int64_t;
+using std::uint64_t;
 }
 #  else
 #include <stdint.h>
 namespace sf{
     
-    typedef ::int8_t int8_t;  //:: global representation
-    typedef ::uint8_t uint8_t;
-    typedef ::int16_t int16_t;
-    typedef ::uint16_t uint16_t;
-    typedef ::int32_t int32_t;
-    typedef ::uint32_t uint32_t;
-    typedef ::int64_t int64_t;
-    typedef ::uint64_t uint64_t;
+typedef ::int8_t int8_t;  //:: global representation
+typedef ::uint8_t uint8_t;
+typedef ::int16_t int16_t;
+typedef ::uint16_t uint16_t;
+typedef ::int32_t int32_t;
+typedef ::uint32_t uint32_t;
+typedef ::int64_t int64_t;
+typedef ::uint64_t uint64_t;
 }
 #  endif
 #else  //pure C,without CPP

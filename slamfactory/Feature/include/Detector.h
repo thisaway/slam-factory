@@ -77,12 +77,12 @@ public:
     *** @param gridRows Rows of grids, when gridRows > 0 and gridCols > 0, means FastDetector will use grid;
     *** @param gridCols Cols of grids, when gridRows > 0 and gridCols > 0, means FastDetector will use grid;
     **/
-    static SharedPtr<FastDetector> createDetectorPtr(int maxNumKeypoints, float pixelThreshold,  \
+    static SharedPtr<FastDetector> createDetectorPtr(uint32_t maxNumKeypoints, float pixelThreshold,  \
             int fastType, int adjacentAreaRadius, int octave, int nmsRadius = 0,  \
             int gridRows = 0, int gridCols = 0);
 
-    virtual int getMaxNumKeypoints() const = 0;
-    virtual void setMaxNumKeypoints(int maxNumKeypoints) = 0;
+    virtual uint32_t getMaxNumKeypoints() const = 0;
+    virtual void setMaxNumKeypoints(uint32_t maxNumKeypoints) = 0;
 
     virtual float getPixelThreshold() const = 0;
     virtual void setPixelThreshold(float pixelThreshold) = 0;

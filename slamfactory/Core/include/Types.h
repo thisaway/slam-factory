@@ -100,11 +100,6 @@ using MatXui64 = Eigen::Matrix<uint64_t, Dynamic, Dynamic>;
 template <typename _Tp, int _Length> 
 using Description = Eigen::Matrix<_Tp, 1, _Length>;
 
-typedef uint8_t BriefMetaType;
-typedef Description<BriefMetaType, 32> BriefDescription256;
-typedef Description<BriefMetaType, 16> BriefDescription128;
-typedef Description<BriefMetaType, 8>  BriefDescription64;
-
 
 /*
 class SF_EXPORTS Pose{

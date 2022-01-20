@@ -1,5 +1,6 @@
 add_executable(testFeature
   testDetector.cc
+  testDescriptor.cc
 )
 
 target_link_libraries(testFeature Sensor Core Feature)

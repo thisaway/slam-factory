@@ -101,7 +101,7 @@ static bool nms(const int& x, const int& y, const int& nmsRadius, const double& 
 void Detector::
 gridAssignment(int rows, int cols){
     
-    assert(rows > 0 and cols > 0);
+    assert(rows >= 0 and cols >= 0);
 
     internalPtr -> gr = rows;
     internalPtr -> gc = cols;
@@ -157,7 +157,7 @@ class FastDetectorImpl SF_FINAL : public FastDetector{
 
 public:
 
-    FastDetectorImpl(int maxNumKeypoints, float pixelThreshold, int fastType,  \
+    FastDetectorImpl(uint32_t maxNumKeypoints, float pixelThreshold, int fastType,  \
         int adjacentAreaRadius, int octave, int nmsRadius = 0, int gridRows = 0,  \
         int gridCols = 0) : mnkps(maxNumKeypoints), pTh(pixelThreshold), areaR(adjacentAreaRadius),  \
         oct(octave), type(fastType), nkps(0){
@@ -170,10 +170,9 @@ public:
     
     ~FastDetectorImpl(){delete internalPtr;}
     
-    inline int getMaxNumKeypoints() const SF_OVERRIDE{return mnkps;}
-    inline void setMaxNumKeypoints(int maxNumKeypoints) SF_OVERRIDE {
+    inline uint32_t getMaxNumKeypoints() const SF_OVERRIDE{return mnkps;}
+    inline void setMaxNumKeypoints(uint32_t maxNumKeypoints) SF_OVERRIDE {
         
-        assert(maxNumKeypoints > 0);
         mnkps = maxNumKeypoints;
     }
 
@@ -207,11 +206,11 @@ private:
     bool isFastCorner(const Image& img, const int& x, const int& y,  \
         const int& fastType, const float& pixelTh, double& score);
     
-    void retainMaximunKps(int cmnkps, std::vector<Keypoint>& keypoints);
+    void retainMaximunKps(uint32_t cmnkps, std::vector<Keypoint>& keypoints);
 
 protected:
 
-    int mnkps;  //max num keypoints;
+    uint32_t mnkps;  //max num keypoints;
     float pTh;  //pixel threshold;
     int areaR;
     int oct;  //octave
@@ -221,7 +220,7 @@ protected:
 
 
 void FastDetectorImpl::
-retainMaximunKps(int cmnkps, std::vector<Keypoint>& keypoints){
+retainMaximunKps(uint32_t cmnkps, std::vector<Keypoint>& keypoints){
 
     if(keypoints.size() == 0){
 
@@ -254,8 +253,8 @@ detectKeypoints(const Image& img, int x, int y, int height,  \
     assert(x + height < img.rows-3 and y + width < img.cols-3);
 
     kpMarks.resize(img.rows, img.cols);
-    for(size_t r = 0; r < img.rows; ++r){
-        for(size_t c = 0; c < img.cols; ++c){
+    for(int r = 0; r < img.rows; ++r){
+        for(int c = 0; c < img.cols; ++c){
             kpMarks(r, c) = Point2i32(-1, -1);
         }
     }
@@ -277,7 +276,7 @@ detectKeypoints(const Image& img, int x, int y, int height,  \
     }
     else{  //assigned grid;
 
-        int gmnkps = mnkps / (gr * gc);
+        uint32_t gmnkps = mnkps / (gr * gc);
 
         int gridCellHeight = height / gr, gridCellWidth = width / gc;
 
@@ -424,7 +423,7 @@ isFastCorner(const Image& img, const int& x, const int& y,  \
 
 
 SharedPtr<FastDetector> FastDetector::
-createDetectorPtr(int maxNumKeypoints, float pixelThreshold, int fastType,  \
+createDetectorPtr(uint32_t maxNumKeypoints, float pixelThreshold, int fastType,  \
         int adjacentAreaRadius, int octave, int nmsRadius, int gridRows,  \
         int gridCols){
 

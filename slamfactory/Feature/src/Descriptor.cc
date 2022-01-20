@@ -269,8 +269,7 @@ static int staticRandomPointsPair31[256 * 4] = {
 };
 
 
-template <int _Length>
-class BriefDescriptorImpl SF_FINAL : public BriefDescriptor<_Length>{
+class BriefDescriptorImpl SF_FINAL : public BriefDescriptor{
 
 public:
 
@@ -278,9 +277,10 @@ public:
             int adjacentAreaRadius, int randomType) : ncp(numComparedPoints),  \
             dl(descriptionLength), aar(adjacentAreaRadius), rt(randomType){
 
-                pointsPair = new int8_t(256 * 4);
-                makeRandomPointsPair();
-            }
+        makeRandomPointsPair();
+    }
+    
+    ~BriefDescriptorImpl(){}
     
     inline int getAdjacentAreaRadius() const SF_OVERRIDE {return aar;}
     inline void setAdjacentAreaRadius(int adjacentAreaRadius) SF_OVERRIDE {
@@ -301,7 +301,7 @@ public:
     inline int getDescriptionLength() const SF_OVERRIDE {return dl;}
     inline void setDescriptionLength(int descriptionLength) SF_OVERRIDE {
         
-        assert(descriptionLength < 257 and descriptionLength % 8 == 0);
+        assert(descriptionLength < 257 and (descriptionLength % BRIEF_BIT_EACH_INT) == 0);
         dl = descriptionLength;
         makeRandomPointsPair();
     }
@@ -309,8 +309,8 @@ public:
     inline int getRandomType() const SF_OVERRIDE {return rt;}
     inline void setRandomType(int randomType) SF_OVERRIDE {
 
-        assert(BriefDescriptor<_Length>::UNIFORM == randomType or  \
-               BriefDescriptor<_Length>::NORMAL == randomType);
+        assert(BriefDescriptor::UNIFORM == randomType or  \
+               BriefDescriptor::NORMAL == randomType);
         
         rt = randomType;
         makeRandomPointsPair();
@@ -319,14 +319,14 @@ public:
 
     void computeDescription(const Image& img,  \
             const std::vector<std::vector<Keypoint>>& keypoints,  \
-            std::vector<std::vector<Description<BriefMetaType, _Length>>>& descriptions) SF_OVERRIDE;
+            std::vector<std::vector<void*>> descriptions) SF_OVERRIDE;
 
 private:
 
     int ncp;
-    int rt;
     int dl;
     int aar;
+    int rt;
     
     int* pointsPair;
 
@@ -340,17 +340,16 @@ private:
 #define RAD_SEED 0x12345678
 
 
-template <int _Length>
-void BriefDescriptorImpl<_Length>::
+void BriefDescriptorImpl::
 makeRandomPointsPair(){
 
-    if(aar == 15 and ncp == 2 and rt == BriefDescriptor<_Length>::NORMAL){
+    if(aar == 15 and ncp == 2 and rt == BriefDescriptor::NORMAL){
 
         pointsPair = staticRandomPointsPair31;
         return;
     }
 
-    if(rt == BriefDescriptor<_Length>::UNIFORM){
+    if(rt == BriefDescriptor::UNIFORM){
 
         std::default_random_engine rng(RAD_SEED);
         std::uniform_int_distribution<int> uniformDistrib(-aar, aar);
@@ -371,13 +370,10 @@ makeRandomPointsPair(){
     > img(static_cast<int>(px + pointsPair[index + 2] * cosa), static_cast<int>(py + pointsPair[index + 3] * sina))
 
 
-template <int _Length>
-void BriefDescriptorImpl<_Length>::
+void BriefDescriptorImpl::
 computeDescription(const Image& img,  \
         const std::vector<std::vector<Keypoint>>& keypoints,  \
-        std::vector<std::vector<Description<BriefMetaType, _Length>>>& descriptions){
-    
-    assert(_Length * 8 == dl);
+        std::vector<std::vector<void*>> descriptions){
     
     size_t ol = keypoints.size();
     size_t il;
@@ -392,6 +388,8 @@ computeDescription(const Image& img,  \
         il = keypoints[i].size();
         descriptions.resize(il);
         for(size_t j = 0; j < il; j++){
+
+            BriefMetaType* descriptionPtr = static_cast<BriefMetaType*>(descriptions[i][j]);
             
             px = keypoints[i][j].x;
             py = keypoints[i][j].y;
@@ -406,7 +404,7 @@ computeDescription(const Image& img,  \
 
                 for(int b = 0; b < BRIEF_BIT_EACH_INT; ++b){
 
-                    descriptions[i][j][d] |= (BRIEF_COMPAIR(pi) << b);
+                    *(descriptionPtr+d) |= (BRIEF_COMPAIR(pi) << b);
                     pi += 4;
                 }
             }
@@ -415,18 +413,16 @@ computeDescription(const Image& img,  \
 }
 
 
-template <int _Length>
-SharedPtr<BriefDescriptor<_Length>> BriefDescriptor<_Length>::
-createDescriptorPtr(int numComparedPoints,  \
-            int descriptionLength, int adjacentAreaRadius,  \
-            int randomType){
+SharedPtr<BriefDescriptor> BriefDescriptor::
+createDescriptorPtr(int numComparedPoints, int descriptionLength, int adjacentAreaRadius,  \
+        int randomType){
     
     assert(numComparedPoints == 2);
-    assert(descriptionLength < 257 and descriptionLength % 8 == 0);
-    assert(BriefDescriptor<_Length>::UNIFORM == randomType or  \
-           BriefDescriptor<_Length>::NORMAL == randomType);
+    assert(descriptionLength < 257 and (descriptionLength % BRIEF_BIT_EACH_INT) == 0);
+    assert(BriefDescriptor::UNIFORM == randomType or  \
+           BriefDescriptor::NORMAL == randomType);
 
-    return std::make_shared<BriefDescriptorImpl<_Length>>(numComparedPoints, descriptionLength, adjacentAreaRadius, randomType);
+    return std::make_shared<BriefDescriptorImpl>(numComparedPoints, descriptionLength, adjacentAreaRadius, randomType);
 }
 
 }  //namespace
